@@ -1,0 +1,52 @@
+{
+  "name": "braindump",
+  "version": "0.0.1",
+  "description": "A slack app to schedule messages",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index",
+    "start": "node index",
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/colestrode/braindump.git"
+  },
+  "keywords": [
+    "slack",
+    "schedule",
+    "messages"
+  ],
+  "author": "Cole Furfaro-Strode",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/colestrode/braindump/issues"
+  },
+  "homepage": "https://github.com/colestrode/braindump#readme",
+  "devDependencies": {
+    "husky": "^0.14.3",
+    "lint-staged": "^4.2.3",
+    "nodemon": "^1.12.1",
+    "prettier-standard": "^7.0.1"
+  },
+  "dependencies": {
+    "botkit": "^0.6.4",
+    "lodash": "^4.17.4",
+    "moment": "^2.19.0",
+    "moment-timezone": "^0.5.13",
+    "skellington": "^1.4.0"
+  },
+  "lint-staged": {
+    "linters": {
+      "src/**/*.js index.js": [
+        "prettier-standard",
+        "git add"
+      ]
+    }
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "./data/*"
+    ]
+  }
+}
