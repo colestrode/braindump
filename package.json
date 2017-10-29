@@ -30,6 +30,7 @@
     "prettier-standard": "^7.0.1"
   },
   "dependencies": {
+    "bluebird": "^3.5.1",
     "botkit": "^0.6.4",
     "lodash": "^4.17.4",
     "moment": "^2.19.0",

@@ -1,5 +1,6 @@
 const moment = require('moment-timezone');
 const _ = require('lodash');
+const Promise = require('bluebird');
 const hours = [{
   label: '9:00 AM',
   value: '09:00'
@@ -199,7 +200,7 @@ module.exports = {
           });
         }
 
-        submission.scheduleDate = moment.tz(`${submission.date}T${submission.time}`, submission.user.tz).toISOString();
+        submission.scheduleDate = moment.tz(`${submission.date}T${submission.time}`, submission.user.tz);
 
         const now = moment();
         if (!now.isBefore(submission.scheduleDate)) {
@@ -220,32 +221,35 @@ module.exports = {
     });
 
     controller.on('dialog_submission', (bot, message) => {
-      const errorMessage = "Error saving message";
       const submission = message.submission;
       const teamId = message.team.id;
-      controller.storage.teams.get(teamId, (err, team) => {
-        if (err) {
-          console.log(teamId); // eslint-disable-line no-console
-          return console.log(errorMessage, err); // eslint-disable-line no-console
-        }
+      const openIm = Promise.promisify(bot.api.im.open, { context: bot.api.im });
+      const postMessage = Promise.promisify(bot.api.chat.postMessage, { context: bot.api.chat });
 
-        if (!team.scheduledMessages) {
-          team.scheduledMessages = [];
-        }
-
-        team.scheduledMessages.push({
-          scheduleDate: submission.scheduleDate,
-          userId: submission.user.id,
-          message: submission.message
-        });
-
-        controller.storage.teams.save(team, (err) => {
-          if (err) {
-            return console.log(errorMessage, err); // eslint-disable-line no-console
+      controller.storage.teams.getAsync(teamId)
+        .then((team) => {
+          if (!team.scheduledMessages) {
+            team.scheduledMessages = [];
           }
-          bot.dialogOk();
-        });
-      });
+  
+          team.scheduledMessages.push({
+            scheduleDate: submission.scheduleDate.toISOString(),
+            recipient: submission.user.id,
+            sender: message.user,
+            message: submission.message
+          });
+          
+          return controller.storage.teams.saveAsync(team);
+        })
+        .then(() => openIm({ user: message.user }))
+        .then((response) => {
+          const channel = response.channel.id;
+          const formattedDate = submission.scheduleDate.format('dddd, MMMM Do [at] h:mm A [their time]')
+          const confirmationMessage = `Hi! I will send this message to <@${submission.user.id}> on ${formattedDate}:\n\n${submission.message}`
+          return postMessage({ channel, as_user: false, text: confirmationMessage })
+        })
+        .then(() => bot.dialogOk())
+        .catch((err) => console.log('Error saving message', err)); // eslint-disable-line no-console
     });
   }
 }
