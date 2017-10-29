@@ -166,7 +166,7 @@ module.exports = {
         .callback_id('braindump')
         .submit_label('Schedule')
         .addTextarea('Send This Message', 'message', null, { placeholder: 'Here is my message' })
-        .addText('To', 'to', null, { placeholder: '@someone'})
+        .addText('To', 'to', null, { placeholder: '@someone'}) // it would be nice to make this a list, but that makes the API call to big and the dialog won't open
         .addSelect('On', 'date', null, dates, { placeholder: 'Choose a date' })
         .addSelect('At (their local time)', 'time', null, hours, { placeholder: 'Choose a time' });
       
@@ -226,7 +226,7 @@ module.exports = {
       const openIm = Promise.promisify(bot.api.im.open, { context: bot.api.im });
       const postMessage = Promise.promisify(bot.api.chat.postMessage, { context: bot.api.chat });
 
-      controller.storage.teams.getAsync(teamId)
+      return controller.storage.teams.getAsync(teamId)
         .then((team) => {
           if (!team.scheduledMessages) {
             team.scheduledMessages = [];

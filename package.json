@@ -35,6 +35,8 @@
     "lodash": "^4.17.4",
     "moment": "^2.19.0",
     "moment-timezone": "^0.5.13",
+    "node-schedule": "^1.2.5",
+    "request": "^2.83.0",
     "skellington": "^1.4.0"
   },
   "lint-staged": {
